@@ -87,7 +87,7 @@ class Builtins:
 
 # NOTE: Just reminding myself we can add to builtins two different ways...
 # __builtins__.update({"event_system": Builtins()})
-builtins.app_name          = "Bulk-Renamer"
+builtins.app_name          = "BulkR"
 builtins.event_system      = Builtins()
 builtins.event_sleep_time  = 0.1
 builtins.debug             = False

@@ -19,12 +19,12 @@ from __init__ import Main
 
 if __name__ == "__main__":
     try:
-        setproctitle('Bulk-Renamer')
+        setproctitle('BulkR')
         GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, Gtk.main_quit)
         faulthandler.enable()  # For better debug info
         parser = argparse.ArgumentParser()
         # Add long and short arguments
-        parser.add_argument("--file", "-f", default="default", help="JUST SOME FILE ARG.")
+        parser.add_argument("--path", "-p", default="default", help="Path to folder.")
 
         # Read arguments (If any...)
         args = parser.parse_args()
