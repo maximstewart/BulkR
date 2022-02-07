@@ -8,7 +8,7 @@ from gi.repository import Gtk
 from gi.repository import GLib
 
 # Application imports
-from mixins import CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin
 from . import ChangeView
 from .widgets import *
 
@@ -19,7 +19,7 @@ def threaded(fn):
     return wrapper
 
 
-class Controller(Gtk.Box, CommonActionsMixin):
+class Controller(Gtk.Box, CommonWidgetGeneratorMixin):
     def __init__(self, args):
         super(Controller, self).__init__()
 
@@ -60,6 +60,9 @@ class Controller(Gtk.Box, CommonActionsMixin):
         actions_scroll_label = Gtk.Label(label="Actions:")
         actions_scroll_label.set_xalign(-20)
         actions_scroll_view, self.actions_list_view = self._create_listBox_widget()
+        actions_scroll_view.set_vexpand(True)
+
+        self.copy_window = Gtk.Box()
 
         self.set_spacing(20)
         self.set_margin_top(5)
@@ -111,13 +114,30 @@ class Controller(Gtk.Box, CommonActionsMixin):
             self.change_view.update_to_list()
             return
 
-        for action in self.action_collection:
+        for i, action in enumerate(self.action_collection):
             if action == target:
+                if type == "move-up":
+                    if i > 0:
+                        parent = target.get_parent()
+                        parent.remove(target)
+                        parent.destroy()
+                        self.actions_list_view.insert(target, (i - 1))
+                        self.action_collection[i-1], self.action_collection[i] = self.action_collection[i], self.action_collection[i - 1]
+                if type == "move-down":
+                    if i < len(self.action_collection):
+                        parent = target.get_parent()
+                        parent.remove(target)
+                        parent.destroy()
+                        self.actions_list_view.insert(target, (i + 1))
+                        self.action_collection[i+1], self.action_collection[i] = self.action_collection[i], self.action_collection[i + 1]
+
                 if type == "delete":
                     self.action_collection.remove(target)
                     target.delete()
                 if type == "run":
                     target.run()
+
+                break
 
 
     def _add_action(self, widget):
@@ -165,3 +185,8 @@ class Controller(Gtk.Box, CommonActionsMixin):
 
     def _str_to_class(self, class_name):
         return getattr(sys.modules[__name__], class_name)()
+
+    # NOTE: Yes, this exists in CommonActionsMixin. But, I don't want to add a while mixin just for one method
+    def _has_method(self, obj, name):
+        ''' Checks if a given method exists. '''
+        return callable(getattr(obj, name, None))

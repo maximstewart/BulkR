@@ -6,20 +6,19 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
 
 
-class Case(Gtk.Box, CommonActionsMixin):
+class Case(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Case, self).__init__()
 
-        label = Gtk.Label(label="Case")
         data  = ["Title Case", "UPPER", "lower", "InVert CaSe --> iNvERT cAsE"]
         self.store, self.combo_box  = self._create_combobox_widget(data)
 
-        label.set_hexpand(True)
+        self.combo_box.set_hexpand(True)
 
-        self.add_widgets([label, self.combo_box])
+        self.add_widgets([self.combo_box])
         self.set_spacing(20)
         self.show_all()
 

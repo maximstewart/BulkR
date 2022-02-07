@@ -7,14 +7,13 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
 
 
-class Insert(Gtk.Box, CommonActionsMixin):
+class Insert(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Insert, self).__init__()
 
-        label              = Gtk.Label(label="Insert:  ")
         self.insert_entry  = Gtk.Entry()
         self.insert_entry.set_hexpand(True)
         self.insert_entry.set_placeholder_text("Insert...")
@@ -24,7 +23,7 @@ class Insert(Gtk.Box, CommonActionsMixin):
 
         self.spin_button = self._create_spinbutton_widget()
 
-        self.add_widgets([label, self.insert_entry, self.combo_box, self.spin_button])
+        self.add_widgets([self.insert_entry, self.combo_box, self.spin_button])
         self.set_spacing(20)
         self.show_all()
 

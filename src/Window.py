@@ -21,7 +21,7 @@ class Window(Gtk.Window, Builtins):
 
         self.add(Controller(args))
         self.connect("delete-event", Gtk.main_quit)
-        self.set_default_size(800, 600)
+        self.set_default_size(850, 600)
         self.set_title(f"{app_name}")
         self.set_icon_from_file("/usr/share/bulkr/bulkr.png")
         self.set_gravity(5)  # 5 = CENTER

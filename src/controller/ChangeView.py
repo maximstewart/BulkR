@@ -7,10 +7,10 @@ gi.require_version('Gdk', '3.0')
 from gi.repository import Gtk, Gdk
 
 # Application imports
-from mixins import CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
 
 
-class ChangeView(Gtk.Box, CommonActionsMixin):
+class ChangeView(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(ChangeView, self).__init__()
 

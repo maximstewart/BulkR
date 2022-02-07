@@ -6,23 +6,22 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
 
 
-class Replace(Gtk.Box, CommonActionsMixin):
+class Replace(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Replace, self).__init__()
 
-        label              = Gtk.Label(label="Replace With:  ")
         self.entry_from    = Gtk.Entry()
         self.entry_to      = Gtk.Entry()
 
         self.entry_from.set_hexpand(True)
         self.entry_to.set_hexpand(True)
-        self.entry_from.set_placeholder_text("From...")
-        self.entry_to.set_placeholder_text("To...")
+        self.entry_from.set_placeholder_text("Replace From...")
+        self.entry_to.set_placeholder_text("Replace To...")
 
-        self.add_widgets([label, self.entry_from, self.entry_to])
+        self.add_widgets([self.entry_from, self.entry_to])
 
         self.set_spacing(20)
         self.show_all()

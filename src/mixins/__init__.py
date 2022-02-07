@@ -1,1 +1,2 @@
 from .CommonActionsMixin import CommonActionsMixin
+from .CommonWidgetGeneratorMixin import CommonWidgetGeneratorMixin

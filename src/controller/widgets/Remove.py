@@ -6,14 +6,13 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
 
 
-class Remove(Gtk.Box, CommonActionsMixin):
+class Remove(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Remove, self).__init__()
 
-        label           = Gtk.Label(label="Remove:  ")
         self.entry_from = Gtk.Entry()
 
         data  = ["All", "Word Start", "Word End", "First Instance", "Last Instance", "RegEx"]
@@ -22,7 +21,7 @@ class Remove(Gtk.Box, CommonActionsMixin):
         self.entry_from.set_hexpand(True)
         self.entry_from.set_placeholder_text("Remove...")
 
-        self.add_widgets([label, self.entry_from, self.combo_box])
+        self.add_widgets([self.entry_from, self.combo_box])
         self.set_spacing(20)
         self.show_all()
 
