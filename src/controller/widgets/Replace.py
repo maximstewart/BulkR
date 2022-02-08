@@ -13,8 +13,8 @@ class Replace(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Replace, self).__init__()
 
-        self.entry_from    = Gtk.Entry()
-        self.entry_to      = Gtk.Entry()
+        self.entry_from = Gtk.Entry()
+        self.entry_to   = Gtk.Entry()
 
         self.entry_from.set_hexpand(True)
         self.entry_to.set_hexpand(True)
