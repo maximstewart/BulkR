@@ -1,5 +1,5 @@
 # Python imports
-import builtins, os
+import builtins, os, re
 from os import path
 
 # Lib imports
@@ -46,6 +46,7 @@ class Builtins:
             for f in os.listdir(_file):
                 self.from_changes.append(f)
 
+            self.from_changes.sort(key=self._natural_keys)
             self.to_changes = self.from_changes
             event_system.push_gui_event(["update-from", None, ()])
             event_system.push_gui_event(["update-to", None, ()])
@@ -82,6 +83,12 @@ class Builtins:
 
     def consume_module_event(self):
         return self._pop_module_event()
+
+    def _atoi(self, text):
+        return int(text) if text.isdigit() else text
+
+    def _natural_keys(self, text):
+        return [ self._atoi(c) for c in re.split('(\d+)',text) ]
 
 
 
