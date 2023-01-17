@@ -6,7 +6,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin
+from mixins import CommonActionsMixin
+
+
 
 
 class Remove(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
@@ -32,23 +35,24 @@ class Remove(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
             new_collection = []
             itr            = self.combo_box.get_active_iter()
             type           = self.store.get(itr, 0)[0]
-            print(f"To Remove:  {from_str}")
+            to_changes     = event_system.emit_and_await("get-to")
 
+            print(f"To Remove:  {from_str}")
             if type == "All":
-                for name in event_system.to_changes:
+                for name in to_changes:
                     new_collection.append(name.replace(from_str, ''))
             if type == "Word Start":
                 print("Stub...")
             if type == "Word End":
                 print("Stub...")
             if type == "First Instance":
-                for name in event_system.to_changes:
+                for name in to_changes:
                     new_collection.append( name.replace(from_str, "", 1) )
             if type == "Last Instance":
-                for name in event_system.to_changes:
+                for name in to_changes:
                     new_collection.append( self._replace_last(name, from_str, "") )
             if type == "RegEx":
                 print("Stub...")
 
-            event_system.to_changes = new_collection
-            event_system.push_gui_event(["update-to", self, ()])
+            event_system.emit("set-to", (new_collection,))
+            event_system.emit("update-to")

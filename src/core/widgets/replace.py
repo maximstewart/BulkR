@@ -6,7 +6,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin
+from mixins import CommonActionsMixin
+
+
 
 
 class Replace(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
@@ -28,13 +31,15 @@ class Replace(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
 
 
     def run(self):
-        fsub = self.entry_from.get_text()
-        tsub = self.entry_to.get_text()
+        fsub       = self.entry_from.get_text()
+        tsub       = self.entry_to.get_text()
+        to_changes = event_system.emit_and_await("get-to")
+
         if fsub and tsub:
             new_collection = []
             print(f"From:  {fsub}\nTo:  {tsub}")
-            for name in event_system.to_changes:
+            for name in to_changes:
                 new_collection.append(name.replace(fsub, tsub))
 
-            event_system.to_changes = new_collection
-            event_system.push_gui_event(["update-to", self, ()])
+            event_system.emit("set-to", (new_collection,))
+            event_system.emit("update-to")

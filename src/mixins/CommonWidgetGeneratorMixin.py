@@ -1,5 +1,4 @@
 # Python imports
-import pathlib
 
 # lib imports
 import gi
@@ -16,7 +15,7 @@ class CommonWidgetGeneratorMixin:
         spin_button.set_wrap(True)
         spin_button.set_digits(0)
         spin_button.set_increments(1.0, 1.0)
-        spin_button.set_range(1, 1000000)
+        spin_button.set_range(0, 1000000)
         spin_button.set_sensitive(False)
 
         return spin_button

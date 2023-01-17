@@ -6,7 +6,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin
+from mixins import CommonActionsMixin
+
+
 
 
 class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
@@ -46,13 +49,14 @@ class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
         new_collection = []
         itr            = self.combo_box.get_active_iter()
         type           = self.store.get(itr, 0)[0]
+        to_changes     = event_system.emit_and_await("get-to")
 
         if type == "Using Sub String":
             fsub = self.entry_from.get_text()
             tsub = self.entry_to.get_text()
 
             print(f"From:  {fsub}\nTo:  {tsub}")
-            for name in event_system.to_changes:
+            for name in to_changes:
                 startIndex = name.index(fsub) + 1
                 endIndex   = name.index(tsub)
                 toRemove   = name[startIndex:endIndex]
@@ -62,12 +66,12 @@ class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
             tsub = self.spin_button_to.get_value_as_int()
 
             print(f"From:  {fsub}\nTo:  {tsub}")
-            for name in event_system.to_changes:
+            for name in to_changes:
                 toRemove   = name[fsub:tsub]
                 new_collection.append(name.replace(toRemove, ''))
 
-            event_system.to_changes = new_collection
-            event_system.push_gui_event(["update-to", self, ()])
+        event_system.emit("set-to", (new_collection,))
+        event_system.emit("update-to")
 
     def _combo_box_changed(self, widget, eve=None):
         itr  = widget.get_active_iter()

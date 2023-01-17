@@ -1,35 +1,69 @@
 # Python imports
-import os, sys, threading, time
+import os
+import sys
 
 # lib imports
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import GLib
 
 # Application imports
 from mixins import CommonWidgetGeneratorMixin
-from . import ChangeView
+from .change_view import ChangeView
 from .widgets import *
 
 
-def threaded(fn):
-    def wrapper(*args, **kwargs):
-        threading.Thread(target=fn, args=args, kwargs=kwargs, daemon=True).start()
-    return wrapper
 
 
 class Controller(Gtk.Box, CommonWidgetGeneratorMixin):
-    def __init__(self, args):
+    def __init__(self, args, unknownargs):
         super(Controller, self).__init__()
 
-        # Add header
+        # # Add header
+        self.change_view       = None
+        self.copy_window       = None
+        self.store             = None
+        self.combo_box         = None
+        self.action_collection = []
+
+        self._setup_styling()
+        self._setup_signals()
+        self._subscribe_to_events()
+        self._load_widgets()
+
+        self.show_all()
+
+        if unknownargs:
+            for arg in unknownargs:
+                if os.path.isdir(arg):
+                    event_system.emit("set-active-path", (arg,))
+
+        if args.path and os.path.isdir(args.path):
+            event_system.emit("set-active-path", (args.path,))
+
+
+    def _setup_styling(self):
+        self.set_spacing(20)
+        self.set_margin_top(5)
+        self.set_margin_bottom(10)
+        self.set_margin_left(15)
+        self.set_margin_right(15)
+        self.set_orientation(1)
+
+    def _setup_signals(self):
+        ...
+
+    def _subscribe_to_events(self):
+        event_system.subscribe("handle-gui-event", self._handle_gui_event)
+
+    def _load_widgets(self):
         self.change_view = ChangeView()
-        action_bar  = Gtk.Box()
-        file_choser = Gtk.FileChooserButton(title="Directory Chooser", action=2) # 2 = SELECT_FOLDER
-        file_filter = Gtk.FileFilter()
+        action_bar       = Gtk.Box()
+
+        file_choser      = Gtk.FileChooserButton(title="Directory Chooser", action=2) # 2 = SELECT_FOLDER
+        file_filter      = Gtk.FileFilter()
         file_choser.show()
-        file_choser.set_filename(event_system.USER_HOME)
+        file_choser.set_filename(USER_HOME)
         file_filter.add_mime_type("inode/directory")
         file_choser.add_filter(file_filter)
 
@@ -64,56 +98,19 @@ class Controller(Gtk.Box, CommonWidgetGeneratorMixin):
 
         self.copy_window = Gtk.Box()
 
-        self.set_spacing(20)
-        self.set_margin_top(5)
-        self.set_margin_bottom(10)
-        self.set_margin_left(15)
-        self.set_margin_right(15)
-        self.set_orientation(1)
-
         self.add(file_choser)
         self.add(action_bar)
         self.add(self.change_view)
         self.add(actions_scroll_label)
         self.add(actions_scroll_view)
         self.add(run_button)
-        self.show_all()
-
-        self.gui_event_observer()
-        self.action_collection = []
-
-
-    @threaded
-    def gui_event_observer(self):
-        while True:
-            time.sleep(event_sleep_time)
-            event = event_system.consume_gui_event()
-            if event:
-                try:
-                    type, target, data = event
-                    if type:
-                        method = getattr(self.__class__, "_handle_gui_event")
-                        GLib.idle_add(method, *(self, type, target, data))
-                    else:
-                        method = getattr(self.__class__, target)
-                        GLib.idle_add(method, *(self, *data,))
-                except Exception as e:
-                    print(repr(e))
 
 
     def update_dir_path(self, widget):
         path = widget.get_filename()
-        event_system.set_active_path(path)
+        event_system.emit("set-active-path", (path,))
 
     def _handle_gui_event(self, type, target, parameters):
-        if type == "update-from":
-            self.change_view.update_from_list()
-            return
-
-        if type == "update-to":
-            self.change_view.update_to_list()
-            return
-
         for i, action in enumerate(self.action_collection):
             if action == target:
                 if type == "move-up":
@@ -150,34 +147,33 @@ class Controller(Gtk.Box, CommonWidgetGeneratorMixin):
         self.action_collection.append(widget)
 
     def _test_all(self, widget=None):
-        event_system.block_to_update = True
-        event_system.reset_to_view()
+        event_system.emit("reset-to-view")
         for action in self.action_collection:
             action.run()
 
-        event_system.block_to_update = False
-        event_system.push_gui_event(["update-to", self, ()])
+        event_system.emit("update-to")
 
     def _reset_to_view(self, widget):
-        event_system.reset_to_view()
+        event_system.emit("reset-to-view")
 
     def _run_all(self, widget):
-        if not event_system.active_path:
+        dir = event_system.emit_and_await("get-active-path")
+        if not dir:
             print("No active path set. Returning...")
             return
 
         self._test_all()
-        dir = event_system.active_path
-        for i, file in enumerate(event_system.from_changes):
+        to_changes = event_system.emit_and_await("get-to")
+        for i, file in enumerate(event_system.emit_and_await("get-from")):
             fPath = f"{dir}/{file}"
-            tPath = f"{dir}/{event_system.to_changes[i]}"
+            tPath = f"{dir}/{to_changes[i]}"
             if fPath != tPath:
                 try:
                     os.rename(fPath, tPath)
                 except Exception as e:
                     print(f"Cant Move:   {fPath}\nTo File:   {tPath}")
 
-        event_system.reset_from_view()
+        event_system.emit("reset-from-view")
 
     def _clean_text(self, text):
         return text.replace(" ", "") \

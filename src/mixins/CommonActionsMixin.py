@@ -40,11 +40,19 @@ class CommonActionsMixin:
     def delete(self):
         self.get_parent().destroy()
 
+
     def _move_up(self, widget):
-        event_system.push_gui_event(["move-up", self, ()])
+        event_system.emit("handle-gui-event", ("move-up", self, ()))
 
     def _move_down(self, widget):
-        event_system.push_gui_event(["move-down", self, ()])
+        event_system.emit("handle-gui-event", ("move-down", self, ()))
+
+    def _remove_self(self, widget):
+        event_system.emit("handle-gui-event", ("delete", self, ()))
+
+    def _do_run(self, widget):
+        event_system.emit("handle-gui-event", ("run", self, ()))
+
 
     def _has_method(self, obj, name):
         ''' Checks if a given method exists. '''
@@ -59,12 +67,3 @@ class CommonActionsMixin:
         reversed = string[::-1]
         replaced = reversed.replace(find[::-1], replace[::-1], 1)
         return replaced[::-1]
-
-
-
-
-    def _remove_self(self, widget):
-        event_system.push_gui_event(["delete", self, ()])
-
-    def _do_run(self, widget):
-        event_system.push_gui_event(["run", self, ()])

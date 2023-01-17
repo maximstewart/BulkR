@@ -6,7 +6,10 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
 # Application imports
-from mixins import CommonWidgetGeneratorMixin, CommonActionsMixin
+from mixins import CommonWidgetGeneratorMixin
+from mixins import CommonActionsMixin
+
+
 
 
 class Case(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
@@ -27,20 +30,21 @@ class Case(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
         new_collection = []
         itr            = self.combo_box.get_active_iter()
         type           = self.store.get(itr, 0)[0]
+        to_changes     = event_system.emit_and_await("get-to")
 
         print(f"Changing Case...")
         if type == "Title Case":
-            for name in event_system.to_changes:
+            for name in to_changes:
                 new_collection.append(name.title())
         if type == "UPPER":
-            for name in event_system.to_changes:
+            for name in to_changes:
                 new_collection.append(name.upper())
         if type == "lower":
-            for name in event_system.to_changes:
+            for name in to_changes:
                 new_collection.append(name.lower())
         if type == "InVert CaSe --> iNvERT cAsE":
-            for name in event_system.to_changes:
+            for name in to_changes:
                 new_collection.append(name.swapcase())
 
-        event_system.to_changes = new_collection
-        event_system.push_gui_event(["update-to", self, ()])
+        event_system.emit("set-to", (new_collection,))
+        event_system.emit("update-to")
