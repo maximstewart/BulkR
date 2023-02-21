@@ -16,6 +16,7 @@ from mixins import CommonActionsMixin
 class Insert(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Insert, self).__init__()
+        self._name         = "Insert"
 
         self.insert_entry  = Gtk.Entry()
         self.insert_entry.set_hexpand(True)

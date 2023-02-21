@@ -68,7 +68,7 @@ class Controller(Gtk.Box, CommonWidgetGeneratorMixin):
         file_choser.add_filter(file_filter)
 
         label = Gtk.Label(label="Bulk Action Type:  ")
-        data  = ["Insert", "Replace", "Remove", "Remove From / To", "Case", "Time"]
+        data  = ["Insert", "Replace", "Remove", "Remove From / To", "Move Substring", "Case", "Time"]
         self.store, self.combo_box  = self._create_combobox_widget(data)
 
         add_button      = Gtk.Button(label="Add Action")

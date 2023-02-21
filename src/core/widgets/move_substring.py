@@ -12,15 +12,16 @@ from mixins import CommonActionsMixin
 
 
 
-class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
+class MoveSubstring(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
-        super(RemoveFromTo, self).__init__()
-        self._name            = "Remove From / To"
+        super(MoveSubstring, self).__init__()
+        self._name                = "Move Substring"
 
-        self.entry_from       = Gtk.Entry()
-        self.entry_to         = Gtk.Entry()
-        self.spin_button_from = self._create_spinbutton_widget()
-        self.spin_button_to   = self._create_spinbutton_widget()
+        self.entry_from           = Gtk.Entry()
+        self.entry_to             = Gtk.Entry()
+        self.spin_button_from     = self._create_spinbutton_widget()
+        self.spin_button_to       = self._create_spinbutton_widget()
+        self.spin_button_insert_index = self._create_spinbutton_widget()
 
         self.entry_from.set_hexpand(True)
         self.entry_to.set_hexpand(True)
@@ -28,8 +29,10 @@ class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
         self.spin_button_to.set_hexpand(True)
         self.spin_button_from.set_sensitive(True)
         self.spin_button_to.set_sensitive(True)
-        self.entry_from.set_placeholder_text("Start...")
-        self.entry_to.set_placeholder_text("End...")
+        self.spin_button_insert_index.set_sensitive(True)
+
+        self.entry_from.set_placeholder_text("Substring Start...")
+        self.entry_to.set_placeholder_text("Substring End...")
 
         data  = ["Using Sub String", "Using Index"]
         self.store, self.combo_box  = self._create_combobox_widget(data)
@@ -38,6 +41,7 @@ class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
                             self.entry_to, \
                             self.spin_button_from, \
                             self.spin_button_to, \
+                            self.spin_button_insert_index, \
                             self.combo_box])
         self.set_spacing(20)
         self.show_all()
@@ -51,18 +55,20 @@ class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
         itr            = self.combo_box.get_active_iter()
         type           = self.store.get(itr, 0)[0]
         to_changes     = event_system.emit_and_await("get-to")
+        insert_index   = self.spin_button_insert_index.get_value_as_int()
 
         if type == "Using Sub String":
             fsub = self.entry_from.get_text()
             tsub = self.entry_to.get_text()
 
-            print(f"From:  {fsub}\nTo:  {tsub}")
+            print(f"From:  {fsub}\nTo:  {tsub}\Move To index: {insert_index}")
             for name in to_changes:
                 try:
-                    startIndex = name.index(f"{fsub}") + 1
-                    endIndex   = name.index(f"{tsub}")
-                    toRemove   = name[startIndex:endIndex]
-                    new_collection.append(name.replace(toRemove, ''))
+                    startIndex = name.index(f"{fsub}")
+                    endIndex   = name.index(f"{tsub}") + 1
+                    toMove     = name[startIndex:endIndex]
+                    str1       = name.replace(toMove, '')
+                    new_collection.append(str1[:insert_index] + toMove + str1[insert_index:])
                 except Exception as e:
                     new_collection.append(name)
         if type == "Using Index":
@@ -71,8 +77,9 @@ class RemoveFromTo(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
 
             print(f"From:  {fsub}\nTo:  {tsub}")
             for name in to_changes:
-                toRemove   = name[fsub:tsub]
-                new_collection.append(name.replace(toRemove, ''))
+                toMove   = name[fsub:tsub]
+                str1       = name.replace(toMove, '')
+                new_collection.append(str1[:insert_index] + toMove + str1[insert_index:])
 
         event_system.emit("set-to", (new_collection,))
         event_system.emit("update-to")

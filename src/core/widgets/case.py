@@ -15,6 +15,7 @@ from mixins import CommonActionsMixin
 class Case(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Case, self).__init__()
+        self._name = "Case"
 
         data  = ["Title Case", "UPPER", "lower", "InVert CaSe --> iNvERT cAsE"]
         self.store, self.combo_box  = self._create_combobox_widget(data)

@@ -15,6 +15,7 @@ from mixins import CommonActionsMixin
 class Remove(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Remove, self).__init__()
+        self._name      = "Remove"
 
         self.entry_from = Gtk.Entry()
 

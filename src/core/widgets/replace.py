@@ -15,6 +15,7 @@ from mixins import CommonActionsMixin
 class Replace(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Replace, self).__init__()
+        self._name      = "Replace"
 
         self.entry_from = Gtk.Entry()
         self.entry_to   = Gtk.Entry()

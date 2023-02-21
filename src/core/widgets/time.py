@@ -16,6 +16,7 @@ from mixins import CommonActionsMixin
 class Time(Gtk.Box, CommonWidgetGeneratorMixin, CommonActionsMixin):
     def __init__(self):
         super(Time, self).__init__()
+        self._name         = "Time"
 
         label              = Gtk.Label(label="Time:  ")
         self.insert_entry  = Gtk.Entry()

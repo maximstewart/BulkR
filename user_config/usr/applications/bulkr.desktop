@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=BulkR
+GenericName=Bulk Renamer
+Comment=Bulk file renaming utility.
+Exec=python /bin/bulkr %f
+Icon=/usr/share/bulkr/bulkr.png
+Type=Application
+StartupNotify=true
+Categories=System;FileTools;Utility;Core;GTK;FileManager;
+Terminal=false
