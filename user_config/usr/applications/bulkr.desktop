@@ -2,7 +2,7 @@
 Name=BulkR
 GenericName=Bulk Renamer
 Comment=Bulk file renaming utility.
-Exec=python /bin/bulkr %f
+Exec=/bin/bulkr %f
 Icon=/usr/share/bulkr/bulkr.png
 Type=Application
 StartupNotify=true
